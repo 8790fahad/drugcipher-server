@@ -57,13 +57,19 @@ export async function getPendingKYCApi() {
   }
 }
 
-export async function updateKycApi({ url = "", query_type = "", id = "" }) {
+export async function updateKycApi({
+  url = "",
+  query_type = "",
+  id = "",
+  pass_phrase = "",
+}) {
   try {
-    db.sequelize.query(`call update_kyc(:id , :query_type, :url  )`, {
+    db.sequelize.query(`call update_kyc(:id , :query_type, :url,:pass_phrase  )`, {
       replacements: {
         id,
         url,
         query_type,
+        pass_phrase,
       },
     });
   } catch (error) {
