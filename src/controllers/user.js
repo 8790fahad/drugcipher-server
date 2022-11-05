@@ -71,7 +71,6 @@ const login = (req, res) => {
     } 
   })
   .then(user => {
-
     //check for user
     if (!user.length) {
       errors.email = 'User not found!';
