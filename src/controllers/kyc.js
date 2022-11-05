@@ -1,5 +1,6 @@
 import { generatePassPhrase } from "passphrase-generator";
 import { transporter } from "..";
+import jwt from "jsonwebtoken";
 import {
   getPendingKYCApi,
   kycFun,
@@ -61,7 +62,7 @@ export const updateKycPL = (req, res) => {
 
 export const getPendingKYC = (req, res) => {
   const {} = req.body;
-  getPendingKYCApi()
+  getPendingKYCApi({ query_type: "gpc", pass_phrase: "" })
     .then((resp) => {
       res.json({ result: resp, success: true });
     })
@@ -77,7 +78,7 @@ export const updateKycSP = (req, res) => {
     mailOptions({
       emailTo: companyEmail,
       templateName: "thanks",
-      subject:"successfully Registration",
+      subject: "successfully Registration",
       context: { company_name: companyName },
     }),
     function (error, info) {
@@ -99,14 +100,14 @@ export const updateKycSP = (req, res) => {
 
 export const updateKycAppproved = (req, res) => {
   const { id, company_email = "", company_name = "" } = req.body;
-  let passPhrase = generatePassPhrase(10);
+  let passPhrase = generatePassPhrase(15);
   let pass = passPhrase.length ? passPhrase.join() : null;
-  let link = `www.drugcipher.com/pawork?pass=${pass}`;
+  let link = `www.drugcipher.com/account/passphrass?id=${id}&pass=${pass}`;
   transporter.sendMail(
     mailOptions({
       emailTo: company_email,
-      templateName: "congrate",
-      subject:"Registration Completed",
+      templateName: "congrate", 
+      subject: "Registration Completed",
       context: {
         company_name: company_name,
         link: link.replace(/[,\s]+|[,\s]+/g, "%20"),
@@ -117,7 +118,11 @@ export const updateKycAppproved = (req, res) => {
         res.status(500).json({ error });
         console.log(error);
       } else {
-        updateKycApi({ id, query_type: "ap", pass_phrase: pass })
+        updateKycApi({
+          id,
+          query_type: "ap",
+          pass_phrase: pass.replace(/[,\s]+|[,\s]+/g, " "),
+        })
           .then((resp) => {
             res.json({ resp, success: true, info });
           })
@@ -129,7 +134,6 @@ export const updateKycAppproved = (req, res) => {
   );
 };
 
-
 export const updateKycReject = (req, res) => {
   const { id, company_email = "", company_name = "" } = req.body;
   let link = `www.drugcipher.com`;
@@ -137,7 +141,7 @@ export const updateKycReject = (req, res) => {
     mailOptions({
       emailTo: company_email,
       templateName: "reject",
-      subject:"Registration Status",
+      subject: "Registration Status",
       context: {
         company_name: company_name,
         link: link,
@@ -158,4 +162,80 @@ export const updateKycReject = (req, res) => {
       }
     }
   );
+};
+
+export const regeneratePassPhrase = (req, res) => {
+  const { id } = req.query;
+  let passPhrase = generatePassPhrase(15);
+  let pass = passPhrase.length ? passPhrase.join() : null;
+  updateKycApi({
+    id,
+    query_type: "gn",
+    pass_phrase: pass.replace(/[,\s]+|[,\s]+/g, " "),
+  })
+    .then((resp) => {
+      res.json({
+        resp,
+        success: true,
+        pass: pass.replace(/[,\s]+|[,\s]+/g, "%20"),
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({ err });
+    });
+};
+
+export const recoverAccount = (req, res) => {
+  const { passPhrase } = req.body;
+  getPendingKYCApi({ pass_phrase: passPhrase, query_type: "recover" })
+    .then((resp) => {
+      //check for account
+      if (!resp.length) {
+        return res.json({ message: "Account not found!" });
+      } else {
+        const payload = { passPhrase }; //jwt payload
+        jwt.sign(
+          payload,
+          "secret",
+          {
+            expiresIn: "30d",
+          },
+          (err, token) => {
+            res.json({
+              success: true,
+              token: "Bearer " + token,
+              info: resp[0],
+            });
+          }
+        );
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({ err });
+    });
+};
+
+export const loadWithToken = (req, res) => {
+  const { token } = req.query;
+  jwt.verify(token, "secret", function (err, decoded) {
+    if (decoded) {
+      getPendingKYCApi({
+        pass_phrase: decoded.passPhrase,
+        query_type: "recover",
+      })
+        .then((resp) => {
+          res.json({
+            success: true,
+            info: resp[0],
+          });
+        })
+        .catch((err) => {
+          res.status(500).json({ err });
+        });
+    } else {
+      res.json({
+        success: false,
+      });
+    }
+  });
 };

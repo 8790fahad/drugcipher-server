@@ -7,6 +7,9 @@ const {
   getPendingKYC,
   updateKycAppproved,
   updateKycReject,
+  regeneratePassPhrase,
+  recoverAccount,
+  loadWithToken,
 } = require("../controllers/kyc");
 
 module.exports = (app) => {
@@ -25,4 +28,7 @@ module.exports = (app) => {
   app.get("/api/v1/get-pending-kyc", getPendingKYC);
   app.put("/api/v1/approved-kyc", updateKycAppproved);
   app.put("/api/v1/reject-kyc", updateKycReject);
+  app.get("/api/v1/regenerate-passphrase", regeneratePassPhrase);
+  app.post("/api/v1/recover-account-passphrass", recoverAccount);
+  app.get("/api/v1/load-with-token", loadWithToken);
 };

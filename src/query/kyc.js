@@ -49,9 +49,20 @@ export async function newsLetterFun({ email = "" }) {
   }
 }
 
-export async function getPendingKYCApi() {
+export async function getPendingKYCApi({
+  query_type = "",
+  pass_phrase = "",
+}) {
   try {
-    return await db.sequelize.query(`call get_pending_company()`);
+    return await db.sequelize.query(
+      `call get_pending_company(:query_type,:pass_phrase)`,
+      {
+        replacements: {
+          query_type,
+          pass_phrase,
+        },
+      }
+    );
   } catch (error) {
     console.log(error);
   }
@@ -64,15 +75,19 @@ export async function updateKycApi({
   pass_phrase = "",
 }) {
   try {
-    db.sequelize.query(`call update_kyc(:id , :query_type, :url,:pass_phrase  )`, {
-      replacements: {
-        id,
-        url,
-        query_type,
-        pass_phrase,
-      },
-    });
+    db.sequelize.query(
+      `call update_kyc(:id , :query_type, :url,:pass_phrase  )`,
+      {
+        replacements: {
+          id,
+          url,
+          query_type,
+          pass_phrase,
+        },
+      }
+    );
   } catch (error) {
     console.log(error);
   }
 }
+
