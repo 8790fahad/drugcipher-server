@@ -3,6 +3,8 @@ import passport from "passport";
 import bodyParser from "body-parser";
 import cors from "cors";
 import models from "./models";
+require("babel-core/register");
+require("babel-polyfill");
 const cloudinary = require("cloudinary");
 const hbs = require("nodemailer-express-handlebars");
 const nodemailer = require("nodemailer");
@@ -10,7 +12,7 @@ const path = require("path");
 const app = express();
 app.use(bodyParser.json());
 
-let port = process.env.PORT || 34567;
+let port = process.env.PORT || 34561;
 
 // set the view engine to ejs
 app.set("view engine", "ejs");

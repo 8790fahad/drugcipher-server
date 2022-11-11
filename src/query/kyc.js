@@ -1,3 +1,5 @@
+"use strict";
+
 import db from "../models";
 
 export async function kycFun({
