@@ -5,14 +5,16 @@ import cors from "cors";
 import models from "./models";
 require("babel-core/register");
 require("babel-polyfill");
+require('dotenv').config();
 const cloudinary = require("cloudinary");
 const hbs = require("nodemailer-express-handlebars");
 const nodemailer = require("nodemailer");
 const path = require("path");
 const app = express();
+
 app.use(bodyParser.json());
 
-let port = process.env.PORT || 34561;
+let port = process.env.PORT;
 
 // set the view engine to ejs
 app.set("view engine", "ejs");
@@ -29,8 +31,8 @@ var transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: "8790fahadado@gmail.com",
-    pass: "ahjdonxvjbfeamzu",
+    user: process.env.EMAIL,
+    pass: process.env.PASSWORD_EMAIL,
   },
 });
 
@@ -60,11 +62,10 @@ export { transporter };
 //default route
 app.get("/", (req, res) => res.send("Hello my World"));
 cloudinary.config({
-  cloud_name: "drxkp1erj",
-  api_key: "218187136849528",
-  api_secret: "dF879L426Z38DnkBvSKuG_IcSCo",
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
 });
-require("./routes/user.js")(app);
 require("./routes/kyc.js")(app);
 
 //create a server

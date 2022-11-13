@@ -10,6 +10,9 @@ const {
   regeneratePassPhrase,
   recoverAccount,
   loadWithToken,
+  addMessage,
+  Addmarketer,
+  getMarketer,
 } = require("../controllers/kyc");
 
 module.exports = (app) => {
@@ -31,4 +34,7 @@ module.exports = (app) => {
   app.get("/api/v1/regenerate-passphrase", regeneratePassPhrase);
   app.post("/api/v1/recover-account-passphrass", recoverAccount);
   app.get("/api/v1/load-with-token", loadWithToken);
+  app.post("/api/v1/add-message", addMessage);
+  app.post("/api/v1/add-marketer",Addmarketer);
+  app.get('/api/v1/get-marketer',getMarketer);
 };

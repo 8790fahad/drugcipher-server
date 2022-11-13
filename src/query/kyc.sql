@@ -1,0 +1,1 @@
+ALTER TABLE `marketers` ADD CONSTRAINT `company_fk` FOREIGN KEY (`company_id`) REFERENCES `kyc`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;

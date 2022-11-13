@@ -5,7 +5,7 @@ export let mailOptions = ({
   subject=''
 }) => {
   return {
-    from: '"DrugCipher" <8790fahadado@gmail.com>', // sender address
+    from: '"DrugCipher" <drucipher@gmail.com>', // sender address
     to: emailTo, // list of receivers
     subject: subject,
     template: templateName, // the name of the template file i.e email.handlebars

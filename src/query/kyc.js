@@ -51,10 +51,54 @@ export async function newsLetterFun({ email = "" }) {
   }
 }
 
-export async function getPendingKYCApi({
-  query_type = "",
-  pass_phrase = "",
+export async function messageApi({ email = "", message = "", id = "" }) {
+  try {
+    db.sequelize.query(`call add_message(:email ,:message,:id)`, {
+      replacements: {
+        email,
+        message,
+        id,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function marketersApi({
+  name = "",
+  email = "",
+  phone_number = "",
+  address = "",
+  country = "",
+  second_address = "",
+  id = "",
+  company_id = "",
+  type=''
 }) {
+  try {
+    db.sequelize.query(
+      `call marketers(:name,:email,:phone_number,:address,:country,:second_address,:id,:company_id,:type)`,
+      {
+        replacements: {
+          name,
+          email,
+          phone_number,
+          address,
+          country,
+          second_address,
+          id,
+          company_id,
+          type
+        },
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getPendingKYCApi({ query_type = "", pass_phrase = "" }) {
   try {
     return await db.sequelize.query(
       `call get_pending_company(:query_type,:pass_phrase)`,
@@ -62,6 +106,22 @@ export async function getPendingKYCApi({
         replacements: {
           query_type,
           pass_phrase,
+        },
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getMarketerApi({ type = "", company_id = "" }) {
+  try {
+    return await db.sequelize.query(
+      `call get_marketers(:type,:company_id)`,
+      {
+        replacements: {
+          type, 
+          company_id,
         },
       }
     );
@@ -92,4 +152,3 @@ export async function updateKycApi({
     console.log(error);
   }
 }
-

@@ -2,8 +2,11 @@ import { generatePassPhrase } from "passphrase-generator";
 import { transporter } from "..";
 import jwt from "jsonwebtoken";
 import {
+  getMarketerApi,
   getPendingKYCApi,
   kycFun,
+  marketersApi,
+  messageApi,
   newsLetterFun,
   updateKycApi,
 } from "../query/kyc";
@@ -60,9 +63,63 @@ export const updateKycPL = (req, res) => {
     });
 };
 
+export const addMessage = (req, res) => {
+  const { email = "", message = "", id = "" } = req.body;
+  messageApi({ id, email, message })
+    .then((resp) => {
+      res.json({ resp, success: true });
+    })
+    .catch((err) => {
+      res.status(500).json({ err });
+    });
+};
+
+export const Addmarketer = (req, res) => {
+  console.log(req.body);
+  const {
+    id = "",
+    companyId = "",
+    fullName= "",
+    email= "",
+    phoneNumber= "",
+    country= "",
+    firstLine= "",
+    secondLine= "",
+    type="marketer"
+  } = req.body;
+  marketersApi({
+    name:fullName,
+    email,
+    phone_number:phoneNumber,
+    address:firstLine,
+    country,
+    second_address:secondLine,
+    id,
+    company_id:companyId,
+    type
+  })
+    .then((resp) => {
+      res.json({ resp, success: true });
+    })
+    .catch((err) => {
+      res.status(500).json({ err });
+    });
+};
+
 export const getPendingKYC = (req, res) => {
   const {} = req.body;
   getPendingKYCApi({ query_type: "gpc", pass_phrase: "" })
+    .then((resp) => {
+      res.json({ result: resp, success: true });
+    })
+    .catch((err) => {
+      res.status(500).json({ err });
+    });
+};
+
+export const getMarketer = (req, res) => {
+  const {companyId='',type} = req.query;
+  getMarketerApi({ type, company_id:companyId })
     .then((resp) => {
       res.json({ result: resp, success: true });
     })
@@ -106,7 +163,7 @@ export const updateKycAppproved = (req, res) => {
   transporter.sendMail(
     mailOptions({
       emailTo: company_email,
-      templateName: "congrate", 
+      templateName: "congrate",
       subject: "Registration Completed",
       context: {
         company_name: company_name,
