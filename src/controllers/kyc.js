@@ -159,7 +159,7 @@ export const updateKycAppproved = (req, res) => {
   const { id, company_email = "", company_name = "" } = req.body;
   let passPhrase = generatePassPhrase(15);
   let pass = passPhrase.length ? passPhrase.join() : null;
-  let link = `www.drugcipher.com/account/passphrass?id=${id}&pass=${pass}`;
+  let link = `www.app.drugcipher.com/account/passphrass?id=${id}&pass=${pass}`;
   transporter.sendMail(
     mailOptions({
       emailTo: company_email,
