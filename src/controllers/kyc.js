@@ -1,5 +1,6 @@
 import { generatePassPhrase } from "passphrase-generator";
 import { transporter } from "..";
+require("dotenv").config();
 import jwt from "jsonwebtoken";
 import {
   getMarketerApi,
@@ -10,7 +11,7 @@ import {
   newsLetterFun,
   updateKycApi,
 } from "../query/kyc";
-import { mailOptions } from "../views/email";
+import { mailOptions, postMailCom, postMailReg } from "../views/email";
 
 export const createCompony = (req, res) => {
   const {
@@ -79,24 +80,24 @@ export const Addmarketer = (req, res) => {
   const {
     id = "",
     companyId = "",
-    fullName= "",
-    email= "",
-    phoneNumber= "",
-    country= "",
-    firstLine= "",
-    secondLine= "",
-    type="marketer"
+    fullName = "",
+    email = "",
+    phoneNumber = "",
+    country = "",
+    firstLine = "",
+    secondLine = "",
+    type = "marketer",
   } = req.body;
   marketersApi({
-    name:fullName,
+    name: fullName,
     email,
-    phone_number:phoneNumber,
-    address:firstLine,
+    phone_number: phoneNumber,
+    address: firstLine,
     country,
-    second_address:secondLine,
+    second_address: secondLine,
     id,
-    company_id:companyId,
-    type
+    company_id: companyId,
+    type,
   })
     .then((resp) => {
       res.json({ resp, success: true });
@@ -118,8 +119,8 @@ export const getPendingKYC = (req, res) => {
 };
 
 export const getMarketer = (req, res) => {
-  const {companyId='',type} = req.query;
-  getMarketerApi({ type, company_id:companyId })
+  const { companyId = "", type } = req.query;
+  getMarketerApi({ type, company_id: companyId })
     .then((resp) => {
       res.json({ result: resp, success: true });
     })
@@ -130,29 +131,30 @@ export const getMarketer = (req, res) => {
 
 export const updateKycSP = (req, res) => {
   const { companyId, companyEmail = "", companyName = "" } = req.query;
+  console.log(req.query);
   const url = req.file ? req.file.path : null;
-  transporter.sendMail(
-    mailOptions({
-      emailTo: companyEmail,
-      templateName: "thanks",
-      subject: "successfully Registration",
-      context: { company_name: companyName },
-    }),
-    function (error, info) {
-      if (error) {
-        res.status(500).json({ error });
-        console.log(error);
-      } else {
-        updateKycApi({ id: companyId, url, query_type: "sp" })
-          .then((resp) => {
-            res.json({ resp, success: true, info });
-          })
-          .catch((err) => {
-            res.status(500).json({ err });
-          });
-      }
-    }
-  );
+  updateKycApi({ id: companyId, url, query_type: "sp" })
+    .then((resp) => {
+      postMailReg(
+        process.env.URL_REG,
+        {
+          company: companyName,
+          recipient: companyEmail,
+        },
+        (_resp) => {
+          console.log(resp);
+          res.json({ _resp, success: true, resp });
+        },
+        (err) => {
+          console.log(err);
+          res.status(500).json({ err });
+        }
+      );
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({ err });
+    });
 };
 
 export const updateKycAppproved = (req, res) => {
@@ -160,35 +162,32 @@ export const updateKycAppproved = (req, res) => {
   let passPhrase = generatePassPhrase(15);
   let pass = passPhrase.length ? passPhrase.join() : null;
   let link = `www.app.drugcipher.com/account/passphrass?id=${id}&pass=${pass}`;
-  transporter.sendMail(
-    mailOptions({
-      emailTo: company_email,
-      templateName: "congrate",
-      subject: "Registration Completed",
-      context: {
-        company_name: company_name,
-        link: link.replace(/[,\s]+|[,\s]+/g, "%20"),
-      },
-    }),
-    function (error, info) {
-      if (error) {
-        res.status(500).json({ error });
-        console.log(error);
-      } else {
-        updateKycApi({
-          id,
-          query_type: "ap",
-          pass_phrase: pass.replace(/[,\s]+|[,\s]+/g, " "),
-        })
-          .then((resp) => {
-            res.json({ resp, success: true, info });
-          })
-          .catch((err) => {
-            res.status(500).json({ err });
-          });
-      }
-    }
-  );
+  updateKycApi({
+    id,
+    query_type: "ap",
+    pass_phrase: pass.replace(/[,\s]+|[,\s]+/g, " "),
+  })
+    .then((resp) => {
+      postMailCom(
+        process.env.URL_COM,
+        {
+          recipient:company_email,
+          company: company_name,
+          link: link.replace(/[,\s]+|[,\s]+/g, "%20"),
+        },
+        (_resp) => {
+          console.log(resp);
+          res.json({ _resp, success: true, resp });
+        },
+        (err) => {
+          console.log(err);
+          res.status(500).json({ err });
+        }
+      );
+    })
+    .catch((err) => {
+      res.status(500).json({ err });
+    });
 };
 
 export const updateKycReject = (req, res) => {

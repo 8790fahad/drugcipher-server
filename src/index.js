@@ -5,7 +5,7 @@ import cors from "cors";
 import models from "./models";
 require("babel-core/register");
 require("babel-polyfill");
-require("dotenv").config();
+require('dotenv').config();
 const cloudinary = require("cloudinary");
 const hbs = require("nodemailer-express-handlebars");
 const nodemailer = require("nodemailer");
@@ -26,10 +26,9 @@ app.use(cors());
 
 // initialize nodemailer
 var transporter = nodemailer.createTransport({
-  name: "mail.yge.wvi.mybluehost.me",
   service: "gmail",
-  host: "mail.yge.wvi.mybluehost.me",
-  port: 465,
+  host: 'smtp.gmail.com',
+  port: process.env.EMAIL_PORT,
   secure: true,
   auth: {
     user: process.env.EMAIL,
