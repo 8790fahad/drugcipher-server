@@ -11,7 +11,12 @@ import {
   newsLetterFun,
   updateKycApi,
 } from "../query/kyc";
-import { mailOptions, postMailCom, postMailReg, postMailRej } from "../views/email";
+import {
+  mailOptions,
+  postMailCom,
+  postMailReg,
+  postMailRej,
+} from "../views/email";
 
 export const createCompony = (req, res) => {
   const {
@@ -193,14 +198,14 @@ export const updateKycAppproved = (req, res) => {
 export const updateKycReject = (req, res) => {
   const { id, company_email = "", company_name = "" } = req.body;
   let link = `www.drugcipher.com`;
-  updateKycApi({ id, query_type: "rj", pass_phrase: pass })
+  updateKycApi({ id, query_type: "rj" })
     .then((resp) => {
       postMailRej(
         process.env.URL_REJE,
         {
           company: company_name,
           link: link,
-          recipient:company_email
+          recipient: company_email,
         },
         (_resp) => {
           console.log(resp);
