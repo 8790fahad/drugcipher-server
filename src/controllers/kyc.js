@@ -11,7 +11,7 @@ import {
   newsLetterFun,
   updateKycApi,
 } from "../query/kyc";
-import { mailOptions, postMailCom, postMailReg } from "../views/email";
+import { mailOptions, postMailCom, postMailReg, postMailRej } from "../views/email";
 
 export const createCompony = (req, res) => {
   const {
@@ -171,7 +171,7 @@ export const updateKycAppproved = (req, res) => {
       postMailCom(
         process.env.URL_COM,
         {
-          recipient:company_email,
+          recipient: company_email,
           company: company_name,
           link: link.replace(/[,\s]+|[,\s]+/g, "%20"),
         },
@@ -193,31 +193,28 @@ export const updateKycAppproved = (req, res) => {
 export const updateKycReject = (req, res) => {
   const { id, company_email = "", company_name = "" } = req.body;
   let link = `www.drugcipher.com`;
-  transporter.sendMail(
-    mailOptions({
-      emailTo: company_email,
-      templateName: "reject",
-      subject: "Registration Status",
-      context: {
-        company_name: company_name,
-        link: link,
-      },
-    }),
-    function (error, info) {
-      if (error) {
-        res.status(500).json({ error });
-        console.log(error);
-      } else {
-        updateKycApi({ id, query_type: "rj", pass_phrase: pass })
-          .then((resp) => {
-            res.json({ resp, success: true, info });
-          })
-          .catch((err) => {
-            res.status(500).json({ err });
-          });
-      }
-    }
-  );
+  updateKycApi({ id, query_type: "rj", pass_phrase: pass })
+    .then((resp) => {
+      postMailRej(
+        process.env.URL_REJE,
+        {
+          company: company_name,
+          link: link,
+          recipient:company_email
+        },
+        (_resp) => {
+          console.log(resp);
+          res.json({ _resp, success: true, resp });
+        },
+        (err) => {
+          console.log(err);
+          res.status(500).json({ err });
+        }
+      );
+    })
+    .catch((err) => {
+      res.status(500).json({ err });
+    });
 };
 
 export const regeneratePassPhrase = (req, res) => {
