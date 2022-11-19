@@ -166,7 +166,7 @@ export const updateKycAppproved = (req, res) => {
   const { id, company_email = "", company_name = "" } = req.body;
   let passPhrase = generatePassPhrase(15);
   let pass = passPhrase.length ? passPhrase.join() : null;
-  let link = `www.app.drugcipher.com/account/passphrass?id=${id}&pass=${pass}`;
+  let link = `https://app.drugcipher.com/account/passphrass?id=${id}&pass=${pass}`;
   updateKycApi({
     id,
     query_type: "ap",
@@ -197,7 +197,7 @@ export const updateKycAppproved = (req, res) => {
 
 export const updateKycReject = (req, res) => {
   const { id, company_email = "", company_name = "" } = req.body;
-  let link = `www.drugcipher.com`;
+  let link = `https://drugcipher.com`;
   updateKycApi({ id, query_type: "rj" })
     .then((resp) => {
       postMailRej(
