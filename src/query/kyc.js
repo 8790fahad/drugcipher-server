@@ -74,7 +74,7 @@ export async function marketersApi({
   second_address = "",
   id = "",
   company_id = "",
-  type=''
+  type = "",
 }) {
   try {
     db.sequelize.query(
@@ -89,7 +89,7 @@ export async function marketersApi({
           second_address,
           id,
           company_id,
-          type
+          type,
         },
       }
     );
@@ -116,15 +116,12 @@ export async function getPendingKYCApi({ query_type = "", pass_phrase = "" }) {
 
 export async function getMarketerApi({ type = "", company_id = "" }) {
   try {
-    return await db.sequelize.query(
-      `call get_marketers(:type,:company_id)`,
-      {
-        replacements: {
-          type, 
-          company_id,
-        },
-      }
-    );
+    return await db.sequelize.query(`call get_marketers(:type,:company_id)`, {
+      replacements: {
+        type,
+        company_id,
+      },
+    });
   } catch (error) {
     console.log(error);
   }
@@ -145,6 +142,109 @@ export async function updateKycApi({
           url,
           query_type,
           pass_phrase,
+        },
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getInfoApi({ id = "", type = "", company_id = "" }) {
+  try {
+    db.sequelize.query(`call get_info(:id , :type, :company_id)`, {
+      replacements: {
+        id,
+        company_id,
+        type,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getScanHistoryApi({ id = "", query_type = "" }) {
+  try {
+    return db.sequelize.query(`call get_scan_history(:id , :query_type)`, {
+      replacements: {
+        id,
+        query_type,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function bookmarkApi({ index = "" }) {
+  try {
+    return db.sequelize.query(`call bookmark(:index)`, {
+      replacements: {
+        index,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function drugHistoryReportApi({
+  drug_id = "",
+  compony_id = "",
+  query_type = "",
+}) {
+  try {
+    return db.sequelize.query(
+      `call drug_history_report(:drug_id,:compony_id,:query_type)`,
+      {
+        replacements: {
+          drug_id,
+          compony_id,
+          query_type,
+        },
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function drugHistoryApi({
+  id = "",
+  accuracy = 0,
+  altitude = 0,
+  altitude_accuracy = 0,
+  heading = 0,
+  latitude = 0,
+  longitude = 0,
+  speed = 0,
+  country = "",
+  compony_id = "",
+  drug_id = "",
+  manufcturer_name = "",
+  generic_name = "",
+  drug_brand_name = "",
+}) {
+  try {
+    db.sequelize.query(
+      `call drug_history(:id, :accuracy, :altitude, :altitude_accuracy, :heading,:latitude, :longitude, :speed, :country, :compony_id, :drug_id,:manufcturer_name,:generic_name,:drug_brand_name)`,
+      {
+        replacements: {
+          id,
+          accuracy,
+          altitude,
+          altitude_accuracy,
+          heading,
+          latitude,
+          longitude,
+          speed,
+          country,
+          compony_id,
+          drug_id,
+          manufcturer_name,
+          generic_name,
+          drug_brand_name,
         },
       }
     );

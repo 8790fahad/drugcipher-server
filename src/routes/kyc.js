@@ -13,6 +13,11 @@ const {
   addMessage,
   Addmarketer,
   getMarketer,
+  drugHistory,
+  getInfo,
+  getScanHistory,
+  bookMark,
+  drugHistoryReport,
 } = require("../controllers/kyc");
 
 module.exports = (app) => {
@@ -35,6 +40,11 @@ module.exports = (app) => {
   app.post("/api/v1/recover-account-passphrass", recoverAccount);
   app.get("/api/v1/load-with-token", loadWithToken);
   app.post("/api/v1/add-message", addMessage);
-  app.post("/api/v1/add-marketer",Addmarketer);
-  app.get('/api/v1/get-marketer',getMarketer);
+  app.post("/api/v1/add-marketer", Addmarketer);
+  app.get("/api/v1/get-marketer", getMarketer);
+  app.get("/api/v1/drug-history", drugHistory);
+  app.post("/api/v1/get-info", getInfo);
+  app.get("/api/v1/get-scan-history", getScanHistory);
+  app.post("/api/v1/bookmark-api", bookMark);
+  app.get('/api/v1/drug-history-report',drugHistoryReport)
 };

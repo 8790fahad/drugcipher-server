@@ -3,8 +3,12 @@ import { transporter } from "..";
 require("dotenv").config();
 import jwt from "jsonwebtoken";
 import {
+  bookmarkApi,
+  drugHistoryApi,
+  drugHistoryReportApi,
   getMarketerApi,
   getPendingKYCApi,
+  getScanHistoryApi,
   kycFun,
   marketersApi,
   messageApi,
@@ -80,6 +84,29 @@ export const addMessage = (req, res) => {
     });
 };
 
+export const drugHistory = (req, res) => {
+  const { email = "", message = "", id = "" } = req.body;
+  drugHistoryApi({
+    id,
+    accuracy,
+    altitude,
+    altitude_accuracy,
+    heading,
+    latitude,
+    longitude,
+    speed,
+    country,
+    compony_id,
+    drug_id,
+  })
+    .then((resp) => {
+      res.json({ resp, success: true });
+    })
+    .catch((err) => {
+      res.status(500).json({ err });
+    });
+};
+
 export const Addmarketer = (req, res) => {
   console.log(req.body);
   const {
@@ -123,9 +150,79 @@ export const getPendingKYC = (req, res) => {
     });
 };
 
+export const drugHistoryReport = (req, res) => {
+  const { drug_id = "", company_id = "", query_type = "" } = req.query;
+  drugHistoryReportApi({ drug_id, compony_id: company_id, query_type })
+    .then((resp) => {
+      res.json({ result: resp, success: true });
+    })
+    .catch((err) => {
+      res.status(500).json({ err });
+    });
+};
+
+export const bookMark = (req, res) => {
+  const { index = 0 } = req.body;
+  bookmarkApi({ index })
+    .then((resp) => {
+      res.json({ result: resp, success: true });
+    })
+    .catch((err) => {
+      res.status(500).json({ err });
+    });
+};
+
+export const getInfo = (req, res) => {
+  console.log(req.body);
+  const {
+    d_id = "",
+    company_id = "",
+    coords = {},
+    country = "",
+    id = "",
+    manufcturer_name = "",
+    generic_name = "",
+    drug_brand_name = "",
+  } = req.body;
+  drugHistoryApi({
+    id: d_id,
+    accuracy: coords.accuracy,
+    altitude: coords.altitude,
+    altitude_accuracy: coords.altitudeAccuracy,
+    heading: coords.heading,
+    latitude: coords.latitude,
+    longitude: coords.longitude,
+    speed: coords.speed,
+    country: country,
+    compony_id: company_id,
+    drug_id: id,
+    manufcturer_name,
+    generic_name,
+    drug_brand_name,
+  })
+    .then((resp) => {
+      res.json({ result: resp, success: true });
+    })
+    .catch((err) => {
+      res.status(500).json({ err });
+    });
+};
+
 export const getMarketer = (req, res) => {
   const { companyId = "", type } = req.query;
   getMarketerApi({ type, company_id: companyId })
+    .then((resp) => {
+      res.json({ result: resp, success: true });
+    })
+    .catch((err) => {
+      res.status(500).json({ err });
+    });
+};
+
+export const getScanHistory = (req, res) => {
+  const { id = "", query_type = "" } = req.query;
+  console.log(req.query);
+  getScanHistoryApi({ id, query_type })
     .then((resp) => {
       res.json({ result: resp, success: true });
     })
