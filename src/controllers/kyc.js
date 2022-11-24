@@ -156,8 +156,8 @@ export const drugHistoryReport = (req, res) => {
   const { company_id = "", id = "", query_type = "" } = req.query;
   console.log(req.query);
   drugHistoryReportApi({ drug_id: id, compony_id: company_id, query_type })
-    .then((resp) => {
-      res.json({ result: resp[0], success: true });
+    .then((result) => {
+      res.json({ result, success: true });
     })
     .catch((err) => {
       res.status(500).json({ err });
