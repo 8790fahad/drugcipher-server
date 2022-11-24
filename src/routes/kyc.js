@@ -18,6 +18,8 @@ const {
   getScanHistory,
   bookMark,
   drugHistoryReport,
+  userClaim,
+  claimApiVerify,
 } = require("../controllers/kyc");
 
 module.exports = (app) => {
@@ -46,5 +48,7 @@ module.exports = (app) => {
   app.post("/api/v1/get-info", getInfo);
   app.get("/api/v1/get-scan-history", getScanHistory);
   app.post("/api/v1/bookmark-api", bookMark);
-  app.get('/api/v1/drug-history-report',drugHistoryReport)
+  app.get("/api/v1/drug-history-report", drugHistoryReport);
+  app.post("/api/v1/user-claim", userClaim);
+  app.get("/api/v1/claim-api-verify", claimApiVerify);
 };

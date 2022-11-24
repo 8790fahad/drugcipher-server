@@ -177,6 +177,31 @@ export async function getScanHistoryApi({ id = "", query_type = "" }) {
   }
 }
 
+export async function claimApi({
+  drug_id = "",
+  email = "",
+  status = false,
+  id = "",
+  query_type = "",
+}) {
+  try {
+    return db.sequelize.query(
+      `call claim(:drug_id , :email,:status,:id,:query_type)`,
+      {
+        replacements: {
+          drug_id,
+          email,
+          status,
+          id,
+          query_type,
+        },
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export async function bookmarkApi({ index = "" }) {
   try {
     return db.sequelize.query(`call bookmark(:index)`, {
@@ -222,13 +247,14 @@ export async function drugHistoryApi({
   country = "",
   compony_id = "",
   drug_id = "",
-  manufcturer_name = "",
+  manufacturer_name = "",
   generic_name = "",
   drug_brand_name = "",
+  valid = false,
 }) {
   try {
     db.sequelize.query(
-      `call drug_history(:id, :accuracy, :altitude, :altitude_accuracy, :heading,:latitude, :longitude, :speed, :country, :compony_id, :drug_id,:manufcturer_name,:generic_name,:drug_brand_name)`,
+      `call drug_history(:id, :accuracy, :altitude, :altitude_accuracy, :heading,:latitude, :longitude, :speed, :country, :compony_id, :drug_id,:manufacturer_name,:generic_name,:drug_brand_name,:valid)`,
       {
         replacements: {
           id,
@@ -242,9 +268,10 @@ export async function drugHistoryApi({
           country,
           compony_id,
           drug_id,
-          manufcturer_name,
+          manufacturer_name,
           generic_name,
           drug_brand_name,
+          valid,
         },
       }
     );

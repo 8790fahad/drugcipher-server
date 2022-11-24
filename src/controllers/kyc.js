@@ -1,9 +1,10 @@
 import { generatePassPhrase } from "passphrase-generator";
-import { transporter } from "..";
+import { v4 as uuid4 } from "uuid";
 require("dotenv").config();
 import jwt from "jsonwebtoken";
 import {
   bookmarkApi,
+  claimApi,
   drugHistoryApi,
   drugHistoryReportApi,
   getMarketerApi,
@@ -17,6 +18,7 @@ import {
 } from "../query/kyc";
 import {
   mailOptions,
+  postMailClaim,
   postMailCom,
   postMailReg,
   postMailRej,
@@ -151,10 +153,11 @@ export const getPendingKYC = (req, res) => {
 };
 
 export const drugHistoryReport = (req, res) => {
-  const { drug_id = "", company_id = "", query_type = "" } = req.query;
-  drugHistoryReportApi({ drug_id, compony_id: company_id, query_type })
+  const { company_id = "", id = "", query_type = "" } = req.query;
+  console.log(req.query);
+  drugHistoryReportApi({ drug_id: id, compony_id: company_id, query_type })
     .then((resp) => {
-      res.json({ result: resp, success: true });
+      res.json({ result: resp[0], success: true });
     })
     .catch((err) => {
       res.status(500).json({ err });
@@ -180,9 +183,10 @@ export const getInfo = (req, res) => {
     coords = {},
     country = "",
     id = "",
-    manufcturer_name = "",
+    manufacturer_name = "",
     generic_name = "",
     drug_brand_name = "",
+    valid = false,
   } = req.body;
   drugHistoryApi({
     id: d_id,
@@ -196,9 +200,10 @@ export const getInfo = (req, res) => {
     country: country,
     compony_id: company_id,
     drug_id: id,
-    manufcturer_name,
+    manufacturer_name,
     generic_name,
     drug_brand_name,
+    valid,
   })
     .then((resp) => {
       res.json({ result: resp, success: true });
@@ -256,6 +261,51 @@ export const updateKycSP = (req, res) => {
     .catch((err) => {
       console.log(err);
       res.status(500).json({ err });
+    });
+};
+
+export const claimApiVerify = (req, res) => {
+  const { id = "", query_type = "" } = req.query;
+  claimApi({ id, query_type })
+    .then((result) => {
+      res.json({ result, success: true });
+    })
+    .catch((err) => {
+      res.status(500).json({ err });
+    });
+};
+
+export const userClaim = (req, res) => {
+  const {
+    drug_id = "",
+    email = "",
+    status = false,
+    query_type = "insert",
+  } = req.body;
+  console.log(req.body);
+  const id = uuid4();
+  const link = `https://app.drugcipher.com/claim-token?id=${id}`;
+  claimApi({ drug_id, email, status, id, query_type })
+    .then((resp) => {
+      postMailClaim(
+        process.env.URL_CLAIM,
+        {
+          link: link,
+          recipient: email,
+        },
+        (_resp) => {
+          console.log(resp);
+          res.json({ _resp, success: true, resp });
+        },
+        (err) => {
+          console.log(err);
+          res.status(500).json({ err });
+        }
+      );
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({ err, success: false });
     });
 };
 
