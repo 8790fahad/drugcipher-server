@@ -239,6 +239,7 @@ export const getScanHistory = (req, res) => {
 export const updateKycSP = (req, res) => {
   const { companyId, companyEmail = "", companyName = "" } = req.query;
   console.log(req.query);
+  console.log(req.file)
   const url = req.file ? req.file.path : null;
   updateKycApi({ id: companyId, url, query_type: "sp" })
     .then((resp) => {
