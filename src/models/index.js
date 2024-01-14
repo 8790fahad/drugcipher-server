@@ -13,6 +13,11 @@ const config = {
   database: process.env.DB_NAME,
   host: process.env.DB_HOST,
   dialect: "mysql",
+  dialectOptions: {
+    authPlugins: {
+      mysql_clear_password: () => require('mysql-clear-password').plugin
+    }
+  },
   pool: {
     max: 5,
     min: 0,
