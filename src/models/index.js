@@ -8,12 +8,11 @@ require('dotenv').config();
 const basename = path.basename(__filename);
 
 const config = {
-  username: "root",
-  password: "",
-  database: "drug-cipher-db",
-  host: "localhost",
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  host: process.env.DB_HOST,
   dialect: "mysql",
-  port:3307,
   pool: {
     max: 5,
     min: 0,
